@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="post-detail">
+
+    <!-- Featured Image -->
+    {% if post.featured_image %}
+    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="post-detail-image">
+    {% endif %}
+
+    <!-- Post Title -->
+    <h1 class="post-detail-title">{{ post.title }}</h1>
+
+    <!-- Meta info -->
+    <div class="post-detail-meta">
+        <span>By {{ post.author.username }}</span>
+        <span>{{ post.created_at|date:"M d, Y" }}</span>
+        {% if post.category %}
+        <span class="category-badge">{{ post.category.name }}</span>
+        {% endif %}
+        <span>{{ post.views }} views</span>
+    </div>
+
+    <!-- Content -->
+    <div class="post-detail-content">
+        {{ post.content|linebreaks }}
+    </div>
+
+    <!-- Related Posts -->
+    {% if related_posts %}
+    <div class="posts-section">
+        <h2 class="section-title">Related Posts</h2>
+        <div class="posts-grid">
+            {% for rpost in related_posts %}
+            <div class="post-card">
+                <a href="{% url 'blog:post_detail' rpost.slug %}">
+                    {% if rpost.featured_image %}
+                        <img src="{{ rpost.featured_image.url }}" alt="{{ rpost.title }}" class="post-card-image">
+                    {% else %}
+                        <div class="post-card-image" style="background-color: #3a3a3a;"></div>
+                    {% endif %}
+                </a>
+                <div class="post-card-body">
+                    <a href="{% url 'blog:post_detail' rpost.slug %}" class="post-card-title">
+                        {{ rpost.title }}
+                    </a>
+                    <a href="{% url 'blog:post_detail' rpost.slug %}" class="btn btn-danger mt-2">Read Now</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Comment Section -->
+    <div class="comments-section">
+        <h3 style="color: #ffffff; margin-bottom: 20px;">Comments</h3>
+
+        {% for comment in comments %}
+        <div class="comment">
+            <div class="comment-header">
+                <span class="comment-author">{{ comment.author.username }}</span>
+                <span class="comment-date">{{ comment.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+            <div class="comment-content">{{ comment.content|linebreaks }}</div>
+        </div>
+        {% empty %}
+        <p style="color:#808080;">No comments yet.</p>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            {% for field in comment_form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field|add_class:"form-control" }}
+                {% if field.errors %}
+                    <div style="color: #e74c3c; font-size: 14px;">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+        {% else %}
+        <p style="color:#808080;">You must <a href="{% url 'accounts:login' %}">login</a> to post a comment.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
