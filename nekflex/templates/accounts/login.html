@@ -1,0 +1,25 @@
+
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+<div class="form-container">
+    <h2 style="color: #ffffff; margin-bottom: 20px;">Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field|add_class:"form-control" }}
+            {% if field.errors %}
+                <div style="color: #e74c3c; font-size: 14px;">
+                    {{ field.errors }}
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
+{% endblock %}
